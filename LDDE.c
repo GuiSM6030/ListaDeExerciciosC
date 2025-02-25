@@ -1,36 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Celula{
-  struct Celula *anterior;
-  struct Celula *proximo;
-  int valor;
-} Celula;
+// Definição da estrutura de um nó na lista duplamente encadeada
+typedef struct no {
+    int valor;
+    struct no *anterior;
+    struct no *proximo;
+} No;
 
-typedef struct LDDE{
-  Celula *primeiro;
-  int qtd;
-} LDDE;
+// Definição da estrutura da lista duplamente encadeada
+typedef struct lista_duplamente_encadeada {
+    int quantidade;
+    No *inicio;
+} ListaDuplamenteEncadeada;
 
-Celula *criar_celula(int valor){
-  Celula *novo = malloc(sizeof(Celula));
-  novo->anterior = NULL;
-  novo->proximo = NULL;
-  novo->valor = valor;
-  return novo;
+/**
+ * Cria uma nova lista duplamente encadeada e a inicializa.
+ *
+ * @return Um ponteiro para a nova lista criada.
+ */
+ListaDuplamenteEncadeada *criar_lista() {
+    ListaDuplamenteEncadeada *lista = malloc(sizeof(ListaDuplamenteEncadeada));
+    lista->inicio = NULL;
+    lista->quantidade = 0;
+    return lista;
 }
 
-LDDE *criar_lista(){
-  LDDE *lista = malloc(sizeof(LDDE));
-  lista->primeiro = NULL;
-  lista->qtd = 0;
-  return lista;
+/**
+ * Cria um novo nó contendo o valor especificado.
+ *
+ * @param valor O valor a ser armazenado no nó.
+ * @return Um ponteiro para o novo nó criado.
+ */
+No *criar_no(int valor) {
+    No *novo_no = malloc(sizeof(No));
+    novo_no->valor = valor;
+    novo_no->anterior = NULL;
+    novo_no->proximo = NULL;
+    return novo_no;
 }
 
-void inserir(LDDE *lista, int valor){
-  Celula *novo = criar_celula(valor);
-  Celula *anterior = NULL;
-  Celula *atual = lista->primeiro;
+/**
+ * Insere um valor na lista de forma ordenada.
+ *
+ * @param lista Ponteiro para a lista onde o valor será inserido.
+ * @param valor O valor a ser inserido na lista.
+ */
+void inserir_valor(ListaDuplamenteEncadeada *lista, int valor) {
+  No *novo_no = criar_no(valor);
+  No *anterior = NULL;
+  No *atual = lista->inicio;
 
   while(atual != NULL && atual->valor < valor){
     anterior = atual;
@@ -38,48 +57,159 @@ void inserir(LDDE *lista, int valor){
   }
 
   if(anterior == NULL){ //inserir no inicio
-    lista->primeiro = novo;
+    lista->inicio = novo_no;
     if(atual != NULL){
-      novo->proximo = atual;
-      atual->anterior = novo;
+      novo_no->proximo = atual;
+      atual->anterior = novo_no;
     }
   }else if(atual == NULL){ //inserir no fim
-    anterior->proximo = novo;
-    novo->anterior = anterior;
+    anterior->proximo = novo_no;
+    novo_no->anterior = anterior;
     
   }else{ //inserir no meio
-    anterior->proximo = novo;
-    novo->anterior = anterior;
-    novo->proximo = atual;
-    atual->anterior = novo;
+    anterior->proximo = novo_no;
+    novo_no->anterior = anterior;
+    novo_no->proximo = atual;
+    atual->anterior = novo_no;
   }
   
-  lista->qtd++;
-
+  lista->quantidade++;
   
   }
 
-void mostrar(LDDE *lista){
-  Celula *atual = lista->primeiro;
+/**
+ * Exibe os valores da lista em ordem crescente.
+ *
+ * @param lista Ponteiro para a lista a ser exibida.
+ */
+void exibir_lista(ListaDuplamenteEncadeada *lista) {
+  No *atual = lista->inicio;
 
+  printf("Início -> ");
   while(atual != NULL){
+    
     printf("%d ", atual->valor);
     atual = atual->proximo;
   }
+  printf("<- Final");
   printf("\n");
-  
 }
 
-int main(void){
-  LDDE *lista = criar_lista();
-  inserir(lista, 12);
-  mostrar(lista);
-  inserir(lista, 8);
-  mostrar(lista);
-  inserir(lista, 18);
-  mostrar(lista);
-  inserir(lista, 15);
-  mostrar(lista);
+/**
+ * Exibe os valores da lista em ordem decrescente.
+ *
+ * @param lista Ponteiro para a lista a ser exibida.
+ */
+void exibir_lista_invertida(ListaDuplamenteEncadeada *lista) {
+    No *atual = lista->inicio;
+
+  while(atual->proximo != NULL){
+    atual = atual->proximo;
+
+  }
+  printf("Final -> ");
+  while(atual != NULL){
+    printf("%d ", atual->valor);
+    atual = atual->anterior;
+  }
+  printf("<- Início");
+
+  printf("\n");
+}
+
+/**
+ * Remove o nó que contém o valor especificado da lista.
+ *
+ * @param lista Ponteiro para a lista de onde o valor será removido.
+ * @param valor O valor a ser removido da lista.
+ */
+void remover_valor(ListaDuplamenteEncadeada *lista, int valor) {
+  No *anterior = NULL;
+  No *atual = lista->inicio;
+
+  while(atual != NULL && atual->valor){
+    anterior = atual;
+    atual = atual->proximo;
+  }
+
+  if(atual == NULL){ //ja foi
+    return;
+  }
+
+  if(atual->proximo == NULL && atual->anterior == NULL){ // meio
+    atual->proximo->anterior = anterior;
   
-  return 0;
+  }
+  if(anterior == NULL){ //inicio
+    lista->inicio = atual->proximo;
+  }
+
+  else{ //fim
+    anterior->proximo = atual->proximo;
+    
+  }
+  
+  free(atual);
+  lista->quantidade--;
+}
+
+
+int main(void) {
+    ListaDuplamenteEncadeada *lista = criar_lista();
+
+    inserir_valor(lista, 10);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    inserir_valor(lista, 5);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    inserir_valor(lista, 20);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    inserir_valor(lista, 15);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    remover_valor(lista, 5);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    remover_valor(lista, 15);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    remover_valor(lista, 20);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    remover_valor(lista, 10);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    for (int i = 1; i <= 10; i++) {
+        inserir_valor(lista, i);
+    }
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    for (int i = 1; i <= 10; i++) {
+        remover_valor(lista, i);
+    }
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    remover_valor(lista, 100);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    inserir_valor(lista, 10);
+    inserir_valor(lista, 10);
+    inserir_valor(lista, 10);
+    exibir_lista(lista);
+    exibir_lista_invertida(lista);
+
+    return 0;
 }
