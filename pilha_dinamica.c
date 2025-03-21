@@ -29,7 +29,7 @@ Pilha *criar_pilha(){
 
 void push(Pilha *pilha, int valor){
     Celula *nova = criar_celula(valor);
-    if(pilha->qtd == 0){
+    if(pilha->qtd > 0){
         pilha->topo->proximo = nova;
         nova->anterior = pilha->topo;
     }
