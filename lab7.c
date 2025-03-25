@@ -52,14 +52,72 @@ char pop(Stack *stack) {
   }
 }
 
+
 int main(void) {
     Stack *stack = start_stack();
+    int parenteses = 0, colchetes = 0, chaves = 0, correto = 1;
+
   
     char expr[100];
     fgets(expr, sizeof(expr), stdin);
 
-    
+    for (int i = 0;expr[i] != '\0'; i++) {
 
+        if (expr[i] == '(') {
+            parenteses++;
+            push(stack, expr[i]);
+            
+        } 
+        if(expr[i] == '['){
+            colchetes++;
+            push(stack, expr[i]);
+            if(parenteses > 0){
+                correto = 0;
+                break;
+            }
+        }
+        if(expr[i] == '{'){
+            chaves++;
+            push(stack, expr[i]);
+            if(colchetes > 0){
+                correto = 0;
+                break;
+            }
+        }
+        if(expr[i] == ')'){
+            if(pop(stack) != '('){
+                correto = 0;
+                break;
+            }
+            parenteses--;
+        }
+
+        if(expr[i] == ']'){
+            if(pop(stack) != '['){
+                correto = 0;
+                break;
+            }
+            colchetes--;
+        }
+        if(expr[i] == '}'){
+            if(pop(stack) != '{'){
+                correto = 0;
+                break;
+            }
+            chaves--;
+        }
+
+    }
+
+    if (correto == 1)
+    {                   
+        printf("correto");
+    }
+    else{
+        printf("incorreto");
+    }
+    
+    
 
     return 0;
 }

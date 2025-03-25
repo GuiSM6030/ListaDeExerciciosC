@@ -80,10 +80,11 @@ float f(float* a, float* b, int n) {
     return s;
 }
 
+
     //O melhor caso é se nenhum elemento de "a" for > 10 ou <= 0, daí então o algoritmo executa apenas o loop principal resultando O(n)
     //O pior caso é se todos os elementos de "a" forem > 10 daí então o algoritmo executa o loop interno n vezes pra cada vez que o principal rodar, resultando O(n^2)
     //Para o melhor caso, o vetor "a" tem que ter todos os elementos > 0 < 10 pra que não entre nos loops internos
-}
+
 
 #include <stdio.h>
 
