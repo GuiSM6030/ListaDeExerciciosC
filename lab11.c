@@ -14,47 +14,49 @@ typedef struct Arvore {
 } Arvore;
 
 void RotacaoEsquerda(Arvore *arvore, Vertice *x) {
-  Vertice *y = x->dir;
-  Vertice *beta = y->esq;
-  x->dir = beta;
-  x->pai = y;
-  y->esq = x;
-
-  if(x->pai == NULL){
-    arvore->raiz = y;
-    y->pai = NULL;
-
-    } else if(x->pai->esq == x){
-        x->pai->esq = y;
-        y->pai = x->pai;
-
-    } else{
-        x->pai->dir = y;
-        y->pai = x->pai;
+    Vertice *y = x->dir;
+    Vertice *beta = y->esq;
+    
+    x->dir = beta;
+    if (beta != NULL) {
+        beta->pai = x;
     }
-
+    
+    y->esq = x;
+    
+    if (x->pai == NULL) {
+        arvore->raiz = y;
+    } else if (x == x->pai->esq) {
+        x->pai->esq = y;
+    } else {
+        x->pai->dir = y;
+    }
+    
+    y->pai = x->pai;
+    x->pai = y;
 }
 
 void RotacaoDireita(Arvore *arvore, Vertice *y) {
-      Vertice *x = y->esq;
-  Vertice *beta = x->dir;
-  y->esq = beta;
-  y->pai = x;
-  x->dir = y;
-
-  if(y->pai == NULL){
-    arvore->raiz = x;
-    x->pai = NULL;
-
-    } else if(y->pai->esq == y){
-        y->pai->esq = x;
-        x->pai = y->pai;
-        
-    } else{
-        y->pai->dir = x;
-         x->pai = y->pai;
+    Vertice *x = y->esq;
+    Vertice *beta = x->dir;
+    
+    y->esq = beta;
+    if (beta != NULL) {
+        beta->pai = y;
     }
-
+    
+    x->dir = y;
+    
+    if (y->pai == NULL) {
+        arvore->raiz = x;
+    } else if (y == y->pai->esq) {
+        y->pai->esq = x;
+    } else {
+        y->pai->dir = x;
+    }
+    
+    x->pai = y->pai;
+    y->pai = x;
 }
 
 int MAX(int x, int y) {
@@ -76,21 +78,24 @@ int fatorBalanceamento(Vertice *x) {
 }
 
 void balanceie(Arvore *arvore, Vertice *x) {
-    if(fatorBalanceamento(x) >= 2 && fatorBalanceamento(x->dir) >= 0){
-        RotacaoEsquerda(arvore, x);
+    while (x != NULL) {
+        int fb = fatorBalanceamento(x);
+        
+        if (fb >= 2) {
+            if (fatorBalanceamento(x->dir) < 0) {
+                RotacaoDireita(arvore, x->dir);
+            }
+            RotacaoEsquerda(arvore, x);
+        } 
+        else if (fb <= -2) {
+            if (fatorBalanceamento(x->esq) > 0) {
+                RotacaoEsquerda(arvore, x->esq);
+            }
+            RotacaoDireita(arvore, x);
+        }
+        
+        x = x->pai;
     }
-    else if (fatorBalanceamento(x) >= 2 && fatorBalanceamento(x->dir) < 0){
-        RotacaoDireita(arvore, x->dir);
-        RotacaoEsquerda(arvore, x);
-    }     
-    else if (fatorBalanceamento(x) <= -2 && fatorBalanceamento(x->esq) <= 0){
-        RotacaoDireita(arvore, x);
-    }      
-    else if (fatorBalanceamento(x) <= -2 && fatorBalanceamento(x->esq) > 0){
-        RotacaoEsquerda(arvore, x->esq);
-        RotacaoDireita(arvore, x);
-    }
-  
 }
 
 int insere(Arvore *arvore, int valor) {
